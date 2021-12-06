@@ -1,3 +1,4 @@
+import os
 from threading import Thread
 from flask import Flask
 import time
@@ -16,56 +17,6 @@ bot.remove_command('help')
 async def on_ready():
 
     print("The bot is ready!")
-
-try:
-    with open("data.txt") as fp:
-        users = json.load(fp)
-except Exception as err:
-    users = {}
-    print(err)
-
-
-def save_users():
-    with open("data.txt", "w+") as fp:
-        json.dump(users, fp, sort_keys=True, indent=4)
-
-
-def add_points(user: discord.User, points: int):
-    id = user.id
-    if id not in users:
-        users[id] = {}
-    users[id]["points"] = users[id].get("points", 0) + points
-    print("{} now has {} points".format(user.name, users[id]["points"]))
-    save_users()
-
-
-def get_points(user: discord.User):
-    id = user.id
-    if id in users:
-        return users[id].get("points", 0)
-    save_users()
-    return 0
-
-#POINTS
-@bot.command(name='points')
-async def on_message(message):
-    if message.author == bot.user:
-        return
-    print("{} sent a message".format(message.author.name))
-    msg = "You have {} points!".format(get_points(message.author))
-    await message.channel.send(msg)
-
-
-@bot.command(name='addpoints')
-async def on_messageadd(user: discord.User, message, points):
-    id = message.author.id
-    if id not in users:
-        users[id] = {}
-    users[id]["points"] = users[id].get("points", 0) + points
-    add_points(id, int(points))
-    save_users()
-
-#points end
 
 @bot.event
 async def on_guild_join(guild):
@@ -235,5 +186,7 @@ def keep_alive():
 
 
 keep_alive()
+my_secret = os.environ['TOK']
+print(my_secret)
+bot.run(my_secret)
 
-bot.run("OTA1ODA2MzMwNTYzMDMxMDkx.YYPb4g.-sjD6maONpKExymYNCdDqlccbVE")
